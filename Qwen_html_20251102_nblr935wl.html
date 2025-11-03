@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Планировщик тренировок — Цикл 8 дней</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+      color: #333;
+      padding: 16px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    header {
+      background: linear-gradient(135deg, #16a085, #27ae60);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    header h1 {
+      font-size: 1.7rem;
+      margin-bottom: 6px;
+    }
+    header p {
+      font-size: 0.95rem;
+      opacity: 0.95;
+    }
+    .immune-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .immune-toggle input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    main {
+      padding: 20px;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+    }
+    .color-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      border: 2px solid #27ae60;
+      border-radius: 50%;
+      background: white;
+      color: #27ae60;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-btn:hover {
+      background: #27ae60;
+      color: white;
+    }
+    .month-title {
+      font-weight: bold;
+      font-size: 1.3rem;
+      text-align: center;
+      flex: 1;
+      margin: 0 12px;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 12px;
+    }
+    .day-name {
+      font-size: 0.75rem;
+      text-align: center;
+      font-weight: bold;
+      color: #555;
+      padding: 6px 0;
+      text-transform: uppercase;
+    }
+    .day-cell {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 10px;
+      position: relative;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .day-cell:hover {
+      transform: scale(1.06);
+      z-index: 2;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .day-number {
+      z-index: 1;
+    }
+    .day-cell.work-day { background: #e3f2fd; color: #0d47a1; }
+    .day-cell.night-shift { background: #ffcdd2; color: #b71c1c; }
+    .day-cell.recovery-light { background: #d7ccc8; color: #5d4037; }
+    .day-cell.day-off { background: #c8e6c9; color: #1b5e20; }
+    .day-cell.today { border: 2px solid #ff5722; box-shadow: 0 0 0 1px white; }
+    .tip {
+      position: absolute;
+      bottom: 2px;
+      font-size: 0.62rem;
+      text-align: center;
+      color: rgba(0,0,0,0.65);
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.9rem;
+      color: #666;
+      background: #f8f9fa;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Планировщик тренировок</h1>
+      <p>Цикл 8 дней • Ноябрь 2025 — Декабрь 2030</p>
+      <div class="immune-toggle">
+        <input type="checkbox" id="immuneToggle">
+        <label for="immuneToggle">Повышенная нагрузка на иммунитет</label>
+      </div>
+    </header>
+
+    <main>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="color-box" style="background: #e3f2fd;"></div>
+          <span>Рабочий день</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-box" style="background: #ffcdd2;"></div>
+          <span>Ночная смена</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-box" style="background: #d7ccc8;"></div>
+          <span>Отсыпной — лёгкая тренировка</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-box" style="background: #c8e6c9;"></div>
+          <span>Выходной — тренировка!</span>
+        </div>
+      </div>
+
+      <div class="calendar-header">
+        <button class="nav-btn" id="prev"><</button>
+        <div class="month-title" id="monthTitle">Ноябрь 2025</div>
+        <button class="nav-btn" id="next">></button>
+      </div>
+
+      <div class="calendar" id="calendar"></div>
+    </main>
+
+    <footer>
+      &copy; 2025 Агафонов Алексей
+    </footer>
+  </div>
+
+  <script>
+    // === НАСТРОЙКИ ===
+    const EXERCISES_BASE_URL = 'exercises'; // папка с TXT-файлами
+
+    // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
+    const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    const monthNames = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+
+    // Точка отсчёта цикла: 1 ноября 2025 — день №1
+    const cycleStart = new Date(2025, 10, 1);
+
+    const cyclePattern = {
+      1: 'day-off',
+      2: 'day-off',
+      3: 'work-day',
+      4: 'work-day',
+      5: 'day-off',
+      6: 'night-shift',
+      7: 'night-shift',
+      8: 'recovery-light'
+    };
+
+    function getDayType(date) {
+      if (date < cycleStart) return 'work-day';
+      if (date > new Date(2030, 11, 31)) return 'work-day';
+
+      const diffMs = date - cycleStart;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const cycleDay = (diffDays % 8) + 1;
+      return cyclePattern[cycleDay];
+    }
+
+    function getSeason(month) {
+      if (month >= 11 || month <= 1) return 'winter';
+      if (month <= 4) return 'spring';
+      if (month <= 7) return 'summer';
+      return 'autumn';
+    }
+
+    function getTip(type) {
+      switch (type) {
+        case 'work-day': return 'Рабочий день';
+        case 'night-shift': return '🌙 Ночная смена';
+        case 'recovery-light': return '🛌 Лёгкая тренировка';
+        case 'day-off': return '✅ Тренировка!';
+        default: return '';
+      }
+    }
+
+    // === МОДАЛЬНОЕ ОКНО ===
+    function showExerciseModal(content) {
+      const modal = document.createElement('div');
+      modal.id = 'exerciseModal';
+      modal.innerHTML = `
+        <div style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; display:flex; align-items:center; justify-content:center;">
+          <div style="background:white; padding:24px; border-radius:16px; max-width:90%; max-height:85%; overflow:auto; font-family:Segoe UI; box-shadow:0 10px 30px rgba(0,0,0,0.4);">
+            <h3 style="margin-top:0; color:#2c3e50;">Упражнения</h3>
+            <ul style="padding-left:24px; line-height:1.7; color:#2c3e50;">${content.split('\n').filter(l => l.trim()).map(line => `<li>${line}</li>`).join('')}</ul>
+            <button id="closeModal" style="margin-top:20px; padding:10px 20px; background:#27ae60; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Закрыть</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      document.getElementById('closeModal').onclick = () => {
+        document.body.removeChild(modal);
+      };
+      modal.onclick = (e) => {
+        if (e.target === modal) document.body.removeChild(modal);
+      };
+    }
+
+    // === ЗАГРУЗКА УПРАЖНЕНИЙ ===
+    async function loadExercises(dayType, season, immune) {
+      const immuneStr = immune ? 'immune' : 'normal';
+      const filename = `${dayType}_${season}_${immuneStr}.txt`;
+      const url = `${EXERCISES_BASE_URL}/${filename}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Файл не найден');
+        const text = await response.text();
+        showExerciseModal(text);
+      } catch (err) {
+        showExerciseModal('Упражнения не найдены.\nПроверьте наличие файла:\n' + filename);
+      }
+    }
+
+    // === ОТРИСОВКА КАЛЕНДАРЯ ===
+    let currentMonth = 10; // ноябрь 2025
+    let currentYear = 2025;
+
+    function renderCalendar(month, year) {
+      const firstDay = new Date(year, month, 1).getDay();
+      const offset = firstDay === 0 ? 6 : firstDay - 1;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const today = new Date();
+
+      const calendar = document.getElementById('calendar');
+      calendar.innerHTML = '';
+
+      weekdays.forEach(day => {
+        const el = document.createElement('div');
+        el.className = 'day-name';
+        el.textContent = day;
+        calendar.appendChild(el);
+      });
+
+      const daysInPrev = new Date(year, month, 0).getDate();
+      for (let i = 0; i < offset; i++) {
+        const el = document.createElement('div');
+        el.className = 'day-cell';
+        el.textContent = daysInPrev - offset + 1 + i;
+        el.style.opacity = '0.4';
+        el.style.background = '#f5f5f5';
+        calendar.appendChild(el);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const type = getDayType(date);
+
+        const el = document.createElement('div');
+        el.className = `day-cell ${type}`;
+        el.innerHTML = `<div class="day-number">${day}</div>`;
+
+        const tip = document.createElement('div');
+        tip.className = 'tip';
+        tip.textContent = getTip(type);
+        el.appendChild(tip);
+
+        if (
+          today.getFullYear() === year &&
+          today.getMonth() === month &&
+          today.getDate() === day
+        ) {
+          el.classList.add('today');
+        }
+
+        // Клик только для тренировочных дней
+        if (type === 'day-off' || type === 'recovery-light') {
+          el.addEventListener('click', () => {
+            const immune = document.getElementById('immuneToggle').checked;
+            const season = getSeason(date.getMonth());
+            loadExercises(type, season, immune);
+          });
+        } else {
+          el.style.cursor = 'default';
+          el.title = 'Тренировка не рекомендуется';
+        }
+
+        calendar.appendChild(el);
+      }
+
+      const totalCells = 42;
+      const usedCells = offset + daysInMonth;
+      const nextDays = totalCells - usedCells;
+      for (let i = 1; i <= nextDays; i++) {
+        const el = document.createElement('div');
+        el.className = 'day-cell';
+        el.textContent = i;
+        el.style.opacity = '0.4';
+        el.style.background = '#f5f5f5';
+        calendar.appendChild(el);
+      }
+
+      document.getElementById('monthTitle').textContent = `${monthNames[month]} ${year}`;
+    }
+
+    // === НАВИГАЦИЯ ===
+    document.getElementById('prev').addEventListener('click', () => {
+      if (currentMonth === 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else {
+        currentMonth--;
+      }
+      if (currentYear < 2025) {
+        currentYear = 2025;
+        currentMonth = 10;
+      }
+      renderCalendar(currentMonth, currentYear);
+    });
+
+    document.getElementById('next').addEventListener('click', () => {
+      if (currentMonth === 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else {
+        currentMonth++;
+      }
+      if (currentYear > 2030) {
+        currentYear = 2030;
+        currentMonth = 11;
+      }
+      renderCalendar(currentMonth, currentYear);
+    });
+
+    // === ИНИЦИАЛИЗАЦИЯ ===
+    const immuneToggle = document.getElementById('immuneToggle');
+    const savedImmune = localStorage.getItem('immuneStress');
+    if (savedImmune !== null) {
+      immuneToggle.checked = JSON.parse(savedImmune);
+    }
+    immuneToggle.addEventListener('change', (e) => {
+      localStorage.setItem('immuneStress', e.target.checked);
+    });
+
+    renderCalendar(currentMonth, currentYear);
+  </script>
+</body>
+</html>
