@@ -340,11 +340,34 @@
 
         const el = document.createElement('div');
         el.className = `day-cell ${type}`;
-        el.innerHTML = `<div class="day-number">${day}</div>`;
+        el.style.position = 'relative';
 
+        // День месяца — сверху по центру
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = day;
+        dayNumber.style.position = 'absolute';
+        dayNumber.style.top = '8px';
+        dayNumber.style.left = '50%';
+        dayNumber.style.transform = 'translateX(-50%)';
+        dayNumber.style.zIndex = '2';
+        dayNumber.style.fontWeight = '600';
+        dayNumber.style.fontSize = '0.9rem';
+
+        // Подсказка — снизу по центру
         const tip = document.createElement('div');
         tip.className = 'tip';
         tip.textContent = getTip(type);
+        tip.style.position = 'absolute';
+        tip.style.bottom = '4px';
+        tip.style.left = '50%';
+        tip.style.transform = 'translateX(-50%)';
+        tip.style.zIndex = '1';
+        tip.style.whiteSpace = 'nowrap';
+        tip.style.fontSize = '0.62rem';
+        tip.style.color = 'rgba(0,0,0,0.65)';
+
+        el.appendChild(dayNumber);
         el.appendChild(tip);
 
         if (
@@ -355,7 +378,6 @@
           el.classList.add('today');
         }
 
-        // Клик только для тренировочных дней
         if (type === 'day-off' || type === 'recovery-light') {
           el.addEventListener('click', () => {
             const immune = document.getElementById('immuneToggle').checked;
